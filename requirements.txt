@@ -1,2 +1,3 @@
 suds
+django-extensions
 
