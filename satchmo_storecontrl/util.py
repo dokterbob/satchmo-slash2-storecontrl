@@ -54,14 +54,20 @@ class Slash2(object):
     @staticmethod
     def _qty_monkey(results):
         """ Monkey method wrapping API results into something useful. """
+
         endresult = []
         for item in results:
-            keys = [o.key[0] for o in item[0]]
-            values = [o.value[0] for o in item[0]]
-        
-            endresult.append(dict(zip(keys, values)))
-    
+            try:
+                keys = [o.key[0] for o in item[0]]
+                values = [o.value[0] for o in item[0]]
+
+                endresult.append(dict(zip(keys, values)))
+
+            except IndexError:
+                logging.error('Monkey failed with IndexError, data was: %s' % item)
+
         return endresult
+            
     
     def __getattr__(self, attr):
         """ Wrap the service's functions nicely in a package. """

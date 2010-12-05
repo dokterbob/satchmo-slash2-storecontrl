@@ -18,6 +18,8 @@ def get_product_by_sku(sku):
         product = Product.objects.get(sku=sku)
 
         logger.debug('Product with SKU %s found.' % sku)
+        
+        return product
 
     except Product.DoesNotExist:
         logger.info('Product with SKU %s not found.' % sku)
@@ -33,11 +35,11 @@ def update_sku_qty(sku, qty):
         product.items_in_stock = Decimal(qty)
         product.save()
         
-        return True
-    else:
-        logger.warning('Quantity for SKU %s not updated.' % sku)
+        logger.debug('Stock updated and saved.')
         
-        return False
+        return True
+        
+    return False
     
 
 class Job(BaseJob):
@@ -60,7 +62,7 @@ class Job(BaseJob):
             success = update_sku_qty(product['sku'], product['qty'])
             
             if product['qty'] > 0:
-                logging.debug('Excellent, this product seems to have some information.')
+                logging.debug('SKU %s has a stock of: %d', product['sku'], product['qty'])
             
             if success:
                 success_list.append(product['sku'])
@@ -69,7 +71,7 @@ class Job(BaseJob):
         
         if success_list:
             # Remove the SKU's which have been processed, if any have been processed at all
-            success = s.removeSkuFromBuffer(success_list)
+            #success = s.removeSkuFromBuffer(success_list)
         
             if success:
                 logger.debug('Removed update SKU\'s from buffer.')
