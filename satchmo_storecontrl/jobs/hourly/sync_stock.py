@@ -59,7 +59,7 @@ class Job(HourlyJob):
         success_list = []
         
         for product in products:
-            logging.debug('Updating SKU %s', product['sku'])
+            logger.debug('Updating SKU %s', product['sku'])
             
             success = update_sku_qty(product['sku'], product['qty'])
             

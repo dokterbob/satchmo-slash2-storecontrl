@@ -1,4 +1,4 @@
-import logging
+import logging, sys
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +41,7 @@ def push_order(sender, order=None, **kwargs):
     # Everything before that will become the first name
     # (as this is mainly used for searching anyways)
     name_split = order.bill_addressee.split()
-    first_name = ''.join(name_split[:-1])
+    first_name = ' '.join(name_split[:-1])
     last_name = name_split[-1]
     
     
@@ -66,7 +66,7 @@ def push_order(sender, order=None, **kwargs):
         # Date defaults to now, which makes sense for now
         #'order_date'                    : "25-12-2011 12:12:12",
         'delivery'                      : 
-            {'cost' : str(order.shipping_cost), 
+            {'cost' : float(order.shipping_cost), 
              'text' : order.shipping_description or ''},
         'order_rules'                   : order_rules,
         # Continue, even when SKU's are not matching
@@ -78,6 +78,7 @@ def push_order(sender, order=None, **kwargs):
     logger.debug('Sending order to Slash2: %s', order_dict)
     
     from suds import WebFault
+    
     try:
         if SLASH2_DEBUG_MODE:
             logger.info('Not writing order to Slash2 - debug mode.')
@@ -89,15 +90,17 @@ def push_order(sender, order=None, **kwargs):
         result = s.checkOrderExists(order.pk)
         if result:
             logger.info('Succesfully pushed order %s to Slash2.', order,
-                        extra={'data': dict(order_dict=order_dict)})
+                        extra={'data': dict(order_dict=order_dict)},)
         else:
             logger.error('Error pushing order %s back to Slash2.', order,
-                         extra={'data': dict(order_dict=order_dict)})
+                         extra={'data': dict(order_dict=order_dict)},
+                         exc_info=sys.exc_info())
+                         
         logger.debug('Result of pushing: %s', result)
     
    
     except WebFault, e:
-        logger.exception('Error pushing to Slash2:')
+        logger.exception('Error pushing to Slash2:', exc_info=sys.exc_info())
 
     # """Track inventory and total sold."""
     # # Added to track total sold for each product
