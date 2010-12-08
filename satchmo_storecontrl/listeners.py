@@ -4,7 +4,9 @@ logger = logging.getLogger(__name__)
 
 from satchmo_storecontrl.util import get_slash2
 from satchmo_storecontrl.settings import SLASH2_CALCULATE_TAX_AUTO, \
-                                         SLASH2_TAX_PERCENT
+                                         SLASH2_TAX_PERCENT, \
+                                         SLASH2_CONTINUE_ORDER, \
+                                         SLASH2_DEBUG_MODE
 
 
 def push_order(sender, order=None, **kwargs):
@@ -22,7 +24,7 @@ def push_order(sender, order=None, **kwargs):
         product = item.product
         
         order_line = {
-            'sku': str(product.sku),
+            'sku': product.sku,
             'qty': str(item.quantity)
         }
         
@@ -48,7 +50,7 @@ def push_order(sender, order=None, **kwargs):
         'customer_firstname'            : first_name,
         'customer_lastname'             : last_name,
         # We're not using the addition
-        'customer_addition'             : '',
+        # 'customer_addition'             : '',
         'customer_update'               : 'update',
         'customer_email'                : order.contact.email,
         'customer_address_street'       : address,
@@ -57,7 +59,7 @@ def push_order(sender, order=None, **kwargs):
         'customer_address_zipcode'      : order.bill_postal_code,
         'customer_address_city'         : order.bill_city,
         #'customer_points'               : '0',
-        'customer_address_country'      : '118',
+        # 'customer_address_country'      : '118',
         # This is not in the Satchmo order
         # 'customer_telephone'            : '',
         # 'customer_fax'                  : '',
@@ -68,7 +70,7 @@ def push_order(sender, order=None, **kwargs):
              'text' : order.shipping_description or ''},
         'order_rules'                   : order_rules,
         # Continue, even when SKU's are not matching
-        'continue_order'                : 'true',
+        'continue_order'                : SLASH2_CONTINUE_ORDER,
         'calculate_tax_auto'            : SLASH2_CALCULATE_TAX_AUTO,
         'tax_percent'                   : SLASH2_TAX_PERCENT,
     }
@@ -77,8 +79,11 @@ def push_order(sender, order=None, **kwargs):
     
     from suds import WebFault
     try:
-        # Push order
-        s.pushOrder(dict(order1=order_dict))
+        if SLASH2_DEBUG_MODE:
+            logger.info('Not writing order to Slash2 - debug mode.')
+        else:
+            # Push order
+            s.pushOrder(dict(order1=order_dict))
     
         # Check if we have success
         result = s.checkOrderExists(order.pk)

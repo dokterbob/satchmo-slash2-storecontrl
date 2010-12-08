@@ -6,7 +6,8 @@ from decimal import Decimal
 
 from django_extensions.management.jobs import BaseJob
 
-from satchmo_storecontrl.settings import SLASH2_QUERY_LIMIT
+from satchmo_storecontrl.settings import SLASH2_QUERY_LIMIT, \
+                                         SLASH2_DEBUG_MODE
 
 from satchmo_storecontrl.util import get_slash2
 
@@ -71,9 +72,12 @@ class Job(BaseJob):
         
         if success_list:
             # Remove the SKU's which have been processed, if any have been processed at all
-            success = s.removeSkuFromBuffer(success_list)
-        
-            if success:
-                logger.debug('Removed updated SKU\'s from buffer.')
+            if SLASH2_DEBUG_MODE:
+                logger.info('Not removing updated articles from buffer - debug mode.')
             else:
-                logging.warning('Error removing SKU\'s from buffer.')
+                success = s.removeSkuFromBuffer(success_list)
+        
+                if success:
+                    logger.debug('Removed updated SKU\'s from buffer.')
+                else:
+                    logging.warning('Error removing SKU\'s from buffer.')
