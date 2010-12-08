@@ -46,7 +46,7 @@ class Job(BaseJob):
     help = "Synchronise stock with Slash2 SOAP server."
 
     def execute(self):
-        s = get_slash()
+        s = get_slash2()
 
         logger.debug('Fetching max. %d updated products.',
                         SLASH2_QUERY_LIMIT)
