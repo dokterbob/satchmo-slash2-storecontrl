@@ -71,7 +71,7 @@ class Job(BaseJob):
         
         if success_list:
             # Remove the SKU's which have been processed, if any have been processed at all
-            #success = s.removeSkuFromBuffer(success_list)
+            success = s.removeSkuFromBuffer(success_list)
         
             if success:
                 logger.debug('Removed update SKU\'s from buffer.')
