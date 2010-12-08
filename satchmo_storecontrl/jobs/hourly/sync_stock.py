@@ -74,6 +74,6 @@ class Job(BaseJob):
             success = s.removeSkuFromBuffer(success_list)
         
             if success:
-                logger.debug('Removed update SKU\'s from buffer.')
+                logger.debug('Removed updated SKU\'s from buffer.')
             else:
                 logging.warning('Error removing SKU\'s from buffer.')
