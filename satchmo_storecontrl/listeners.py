@@ -100,16 +100,6 @@ def push_order(sender, order=None, **kwargs):
     
    
     except WebFault, e:
-        logger.exception('Error pushing to Slash2:', exc_info=sys.exc_info())
-
-    # """Track inventory and total sold."""
-    # # Added to track total sold for each product
-    # for item in order.orderitem_set.all():
-    #     product = item.product
-    #     product.total_sold += item.quantity
-    #     if config_value('PRODUCT','TRACK_INVENTORY'):
-    #         product.items_in_stock -= item.quantity
-    #     product.save()
-
+        logger.exception('Error pushing to Slash2:')
 
                                           
