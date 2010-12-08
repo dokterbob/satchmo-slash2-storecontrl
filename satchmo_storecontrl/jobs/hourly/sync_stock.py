@@ -4,7 +4,7 @@ logger = logging.getLogger(__name__)
 
 from decimal import Decimal
 
-from django_extensions.management.jobs import BaseJob
+from django_extensions.management.jobs import HourlyJob
 
 from satchmo_storecontrl.settings import SLASH2_QUERY_LIMIT, \
                                          SLASH2_DEBUG_MODE
@@ -43,7 +43,7 @@ def update_sku_qty(sku, qty):
     return False
     
 
-class Job(BaseJob):
+class Job(HourlyJob):
     help = "Synchronise stock with Slash2 SOAP server."
 
     def execute(self):
