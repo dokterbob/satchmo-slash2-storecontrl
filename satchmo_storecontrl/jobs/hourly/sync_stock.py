@@ -18,12 +18,12 @@ def get_product_by_sku(sku):
     try:
         product = Product.objects.get(sku=sku)
 
-        logger.debug('Product with SKU %s found.', sku)
+        logger.debug('Product found.', extra={'data': dict(sku=sku)})
         
         return product
 
     except Product.DoesNotExist:
-        logger.info('Product with SKU %s not found.', sku)
+        logger.info('Product not found.', extra={'data': dict(sku=sku)})
         
         return None
 
@@ -59,27 +59,24 @@ class Job(HourlyJob):
         success_list = []
         
         for product in products:
-            logger.debug('Updating SKU %s', product['sku'])
+            logger.debug('Updating SKU',
+                         extra={'data': dict(sku=product['sku'],
+                                             stock=product['qty'])})
             
             success = update_sku_qty(product['sku'], product['qty'])
-            
-            if product['qty'] > 0:
-                logging.debug('SKU %s has a stock of: %d', 
-                              product['sku'], product['qty'])
-            
+                        
             if success:
-                success_list.append(product['sku'])
+                # Remove the SKU's which have been processed, if any have been processed at all
+                if SLASH2_DEBUG_MODE:
+                    logger.info('Not removing updated articles from buffer - debug mode.')
+                else:
+                
+                    success = s.removeSkuFromBuffer([product['sku'],])
+        
+                    if success:
+                        logger.debug('Removed updated SKU\'s from buffer.')
+                    else:
+                        logging.warning('Error removing SKU\'s from buffer.')
         
         logger.info('Updated stock quantity for %d products.' % len(success_list))
         
-        if success_list:
-            # Remove the SKU's which have been processed, if any have been processed at all
-            if SLASH2_DEBUG_MODE:
-                logger.info('Not removing updated articles from buffer - debug mode.')
-            else:
-                success = s.removeSkuFromBuffer(success_list)
-        
-                if success:
-                    logger.debug('Removed updated SKU\'s from buffer.')
-                else:
-                    logging.warning('Error removing SKU\'s from buffer.')
