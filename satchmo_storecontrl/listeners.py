@@ -22,7 +22,7 @@ def push_order(sender, order=None, **kwargs):
         product = item.product
         
         order_line = {
-            'sku': product.sku,
+            'sku': str(product.sku),
             'qty': str(item.quantity)
         }
         
@@ -75,19 +75,24 @@ def push_order(sender, order=None, **kwargs):
         
     logger.debug('Sending order to Slash2: %s', order_dict)
     
-    # Push order
-    #s.pushOrder({'order1': order_dict})
+    from suds import WebFault
+    try:
+        # Push order
+        s.pushOrder(dict(order1=order_dict))
     
-    # Check if we have success
-    result = s.checkOrderExists(order.pk)
-    if result:
-        logger.info('Succesfully pushed order %s to Slash2.', order,
-                    extra={'data': dict(order_dict=order_dict)})
-    else:
-        logger.error('Error pushing order %s back to Slash2.', order,
-                     extra={'data': dict(order_dict=order_dict)})
-    logger.debug('Result of pushing: %s', result)
+        # Check if we have success
+        result = s.checkOrderExists(order.pk)
+        if result:
+            logger.info('Succesfully pushed order %s to Slash2.', order,
+                        extra={'data': dict(order_dict=order_dict)})
+        else:
+            logger.error('Error pushing order %s back to Slash2.', order,
+                         extra={'data': dict(order_dict=order_dict)})
+        logger.debug('Result of pushing: %s', result)
     
+   
+    except WebFault, e:
+        logger.exception('Error pushing to Slash2:')
 
     # """Track inventory and total sold."""
     # # Added to track total sold for each product
