@@ -104,3 +104,15 @@ class Slash2(object):
         
         raise AttributeError, "'%s' object has no attribute '%s'" % \
             (self.__class__.__name__, str(attr))
+
+def get_slash2():
+    logger.debug('Opening connection.') 
+
+    from satchmo_storecontrl.settings import SLASH2_CREDENTIALS, \
+                                             SLASH2_API_ENDPOINT
+
+    s = Slash2(credentials=SLASH2_CREDENTIALS, 
+               endpoint=SLASH2_API_ENDPOINT)
+    
+    return s
+

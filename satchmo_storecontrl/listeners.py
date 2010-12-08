@@ -2,6 +2,10 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+from satchmo_storecontrl.util import get_slash2
+from satchmo_storecontrl.settings import SLASH2_CALCULATE_TAX_AUTO, \
+                                         SLASH2_TAX_PERCENT
+
 
 def push_order(sender, order=None, **kwargs):
     """ Push the order back to Slash2. """
@@ -9,6 +13,8 @@ def push_order(sender, order=None, **kwargs):
     assert order, 'Order should not be none.'
     
     logger.debug('Pushing order %s to Slash2.', order)
+    
+    s = get_slash2()
 
     # Compose order rules
     order_rules = []
@@ -63,12 +69,25 @@ def push_order(sender, order=None, **kwargs):
         'order_rules'                   : order_rules,
         # Continue, even when SKU's are not matching
         'continue_order'                : 'true',
-        # Make something like a configuration option from this
-        #'calculate_tax_auto'            : 'true',
-        #'tax_percent'                   : 19
+        'calculate_tax_auto'            : SLASH2_CALCULATE_TAX_AUTO,
+        'tax_percent'                   : SLASH2_TAX_PERCENT,
     }
         
     logger.debug('Sending order to Slash2: %s', order_dict)
+    
+    # Push order
+    #s.pushOrder({'order1': order_dict})
+    
+    # Check if we have success
+    result = s.checkOrderExists(order.pk)
+    if result:
+        logger.info('Succesfully pushed order %s to Slash2.', order,
+                    extra={'data': dict(order_dict=order_dict)})
+    else:
+        logger.error('Error pushing order %s back to Slash2.', order,
+                     extra={'data': dict(order_dict=order_dict)})
+    logger.debug('Result of pushing: %s', result)
+    
 
     # """Track inventory and total sold."""
     # # Added to track total sold for each product

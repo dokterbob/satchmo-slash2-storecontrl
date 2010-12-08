@@ -6,9 +6,9 @@ from decimal import Decimal
 
 from django_extensions.management.jobs import BaseJob
 
-from satchmo_storecontrl.settings import *
+from satchmo_storecontrl.settings import SLASH2_QUERY_LIMIT
 
-from satchmo_storecontrl.util import Slash2
+from satchmo_storecontrl.util import get_slash2
 
 from product.models import Product
 
@@ -17,12 +17,12 @@ def get_product_by_sku(sku):
     try:
         product = Product.objects.get(sku=sku)
 
-        logger.debug('Product with SKU %s found.' % sku)
+        logger.debug('Product with SKU %s found.', sku)
         
         return product
 
     except Product.DoesNotExist:
-        logger.info('Product with SKU %s not found.' % sku)
+        logger.info('Product with SKU %s not found.', sku)
         
         return None
 
@@ -46,15 +46,14 @@ class Job(BaseJob):
     help = "Synchronise stock with Slash2 SOAP server."
 
     def execute(self):
-        logger.debug('Opening connection.')
-        
-        s = Slash2(credentials=SLASH2_CREDENTIALS, endpoint=SLASH2_API_ENDPOINT)
+        s = get_slash()
 
-        logger.debug('Fetching max. %d updated products.' % SLASH2_QUERY_LIMIT)
+        logger.debug('Fetching max. %d updated products.',
+                        SLASH2_QUERY_LIMIT)
         
         products = s.getProductQty({'limit': SLASH2_QUERY_LIMIT})
         
-        logger.debug('%d products returned.' % len(products))        
+        logger.debug('%d products returned.', len(products))        
         
         success_list = []
         
@@ -62,7 +61,8 @@ class Job(BaseJob):
             success = update_sku_qty(product['sku'], product['qty'])
             
             if product['qty'] > 0:
-                logging.debug('SKU %s has a stock of: %d', product['sku'], product['qty'])
+                logging.debug('SKU %s has a stock of: %d', 
+                              product['sku'], product['qty'])
             
             if success:
                 success_list.append(product['sku'])
