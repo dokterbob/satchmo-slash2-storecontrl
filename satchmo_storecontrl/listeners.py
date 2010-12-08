@@ -23,7 +23,7 @@ def push_order(sender, order=None, **kwargs):
         
         order_line = {
             'sku': product.sku,
-            'qty': item.quantity
+            'qty': str(item.quantity)
         }
         
         order_rules.append(order_line)
@@ -44,7 +44,7 @@ def push_order(sender, order=None, **kwargs):
     
     
     order_dict = {
-        'order_id'                      : order.pk,
+        'order_id'                      : str(order.pk),
         'customer_firstname'            : first_name,
         'customer_lastname'             : last_name,
         # We're not using the addition
@@ -64,8 +64,8 @@ def push_order(sender, order=None, **kwargs):
         # Date defaults to now, which makes sense for now
         #'order_date'                    : "25-12-2011 12:12:12",
         'delivery'                      : 
-            {'cost' : order.shipping_cost, 
-             'text' : order.shipping_description },
+            {'cost' : str(order.shipping_cost), 
+             'text' : order.shipping_description or ''},
         'order_rules'                   : order_rules,
         # Continue, even when SKU's are not matching
         'continue_order'                : 'true',
