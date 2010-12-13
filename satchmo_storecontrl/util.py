@@ -64,7 +64,7 @@ class Slash2(object):
                 endresult.append(dict(zip(keys, values)))
 
             except IndexError:
-                logging.error('Monkey failed with IndexError, data was: %s' % item)
+                logging.exception('Monkey failed with IndexError, data was: %s' % item)
 
         return endresult
             

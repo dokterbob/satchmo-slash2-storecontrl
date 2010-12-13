@@ -36,8 +36,9 @@ def update_sku_qty(sku, qty):
         product.items_in_stock = Decimal(qty)
         product.save()
         
-        logger.debug('Stock updated and saved.')
-        
+        logger.info('Stock updated and saved.', 
+                     extra={'data': dict(sku=sku, qty=qty, product=product)})
+       
         return True
         
     return False
@@ -77,6 +78,4 @@ class Job(HourlyJob):
                         logger.debug('Removed updated SKU\'s from buffer.')
                     else:
                         logging.warning('Error removing SKU\'s from buffer.')
-        
-        logger.info('Updated stock quantity for %d products.' % len(success_list))
         
