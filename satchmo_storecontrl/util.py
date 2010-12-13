@@ -50,20 +50,37 @@ class Slash2(object):
 
         self.service = c.service
         self.credentials = credentials
+
+    @staticmethod
+    def doofus(obj):
+        """ Doofus prevents IndexErrors from happening where they should not. He
+            is a big friend of Monkey.
+        """
+        
+        try:
+            return obj[0]
     
+        except IndexError:
+        
+            logging.debug('Invalid data in Monkey. Exception prevented.')
+            return [] 
+
+
     @staticmethod
     def _qty_monkey(results):
         """ Monkey method wrapping API results into something useful. """
-
+                
         endresult = []
         for item in results:
             try:
-                keys = [o.key[0] for o in item[0]]
-                values = [o.value[0] for o in item[0]]
+                keys = [Slash2.doofus(o.key) for o in item[0]]
+                
+
+                values = [Slash2.doofus(o.value) for o in item[0]]
 
                 endresult.append(dict(zip(keys, values)))
 
-            except IndexError:
+            except Exception:
                 logging.exception('Monkey failed with IndexError, data was: %s' % item)
 
         return endresult
