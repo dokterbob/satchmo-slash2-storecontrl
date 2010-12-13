@@ -2,7 +2,7 @@ import logging, sys
 
 logger = logging.getLogger(__name__)
 
-from satchmo_storecontrl.util import get_slash2
+from satchmo_storecontrl.util import get_slash2, countries
 from satchmo_storecontrl.settings import SLASH2_CALCULATE_TAX_AUTO, \
                                          SLASH2_TAX_PERCENT, \
                                          SLASH2_CONTINUE_ORDER, \
@@ -36,6 +36,9 @@ def push_order(sender, order=None, **kwargs):
     if order.bill_street2:
         address += "\n%s" % order.bill_street2
     
+    # See if we can find the country 
+    country = countries.get(order.bill_country, None)
+    
     # Separate the customers' first and last name
     # The last word in the name is generally the last name
     # Everything before that will become the first name
@@ -59,7 +62,7 @@ def push_order(sender, order=None, **kwargs):
         'customer_address_zipcode'      : order.bill_postal_code,
         'customer_address_city'         : order.bill_city,
         #'customer_points'               : '0',
-        # 'customer_address_country'      : '118',
+        'customer_address_country'      : country,
         # This is not in the Satchmo order
         # 'customer_telephone'            : '',
         # 'customer_fax'                  : '',
