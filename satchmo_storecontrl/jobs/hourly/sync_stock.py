@@ -18,28 +18,37 @@ def get_product_by_sku(sku):
     try:
         product = Product.objects.get(sku=sku)
 
-        logger.debug('Product found.', extra={'data': dict(sku=sku)})
+        logger.debug('Product found', extra={'data': dict(sku=sku)})
         
         return product
 
     except Product.DoesNotExist:
-        logger.info('Product not found.', extra={'data': dict(sku=sku)})
+        logger.info('Product not found', extra={'data': dict(sku=sku)})
         
         return None
 
 def update_sku_qty(sku, qty):
     """ Updates the QTY for a given SKU, if available. """
+
+    logger.debug('Updating SKU',
+                 extra={'data': dict(sku=sku,
+                                     stock=qty)})
     
     product = get_product_by_sku(sku)
     
     if product:
-        product.items_in_stock = Decimal(qty)
-        product.save()
+        if sku != None:
+            product.items_in_stock = Decimal(qty)
+            product.save()
         
-        logger.info('Stock updated and saved.', 
-                     extra={'data': dict(sku=sku, qty=qty, product=product)})
+            logger.info('Stock updated and saved', 
+                extra={'data': dict(sku=sku, qty=qty, product=product)})
        
-        return True
+            return True
+        
+        else:
+            logger.info('No stock quantity for product',
+                        extra={'data': dict(product=product)})
         
     return False
     
@@ -59,11 +68,7 @@ class Job(HourlyJob):
         
         success_list = []
         
-        for product in products:
-            logger.debug('Updating SKU',
-                         extra={'data': dict(sku=product['sku'],
-                                             stock=product['qty'])})
-            
+        for product in products:            
             success = update_sku_qty(product['sku'], product['qty'])
                         
             if success:
