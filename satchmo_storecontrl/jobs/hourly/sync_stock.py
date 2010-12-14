@@ -29,15 +29,16 @@ def get_product_by_sku(sku):
 
 def update_sku_qty(sku, qty):
     """ Updates the QTY for a given SKU, if available. """
+    
+    if qty != None:
+        logger.debug('Updating SKU',
+                     extra={'data': dict(sku=sku,
+                                         stock=qty)})
+    
+        product = get_product_by_sku(sku)
 
-    logger.debug('Updating SKU',
-                 extra={'data': dict(sku=sku,
-                                     stock=qty)})
-    
-    product = get_product_by_sku(sku)
-    
-    if product:
-        if sku != None:
+        if product:
+
             product.items_in_stock = Decimal(qty)
             product.save()
         
@@ -46,9 +47,9 @@ def update_sku_qty(sku, qty):
        
             return True
         
-        else:
-            logger.info('No stock quantity for product',
-                        extra={'data': dict(product=product)})
+    else:
+        logger.info('No stock quantity for SKU',
+                    extra={'data': dict(sku=sku)})
         
     return False
     
