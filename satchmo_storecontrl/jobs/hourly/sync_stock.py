@@ -67,13 +67,13 @@ def update_products(slash2, products):
             if SLASH2_DEBUG_MODE:
                 logger.info('Not removing updated articles from buffer - debug mode.')
             else:
-        
-                success = slash2.removeSkuFromBuffer([product['sku'],])
+                if not SLASH2_FETCH_ALL:
+                    success = slash2.removeSkuFromBuffer([product['sku'],])
 
-                if success:
-                    logger.debug('Removed updated SKU\'s from buffer')
-                else:
-                    logging.warning('Error removing SKU\'s from buffer')
+                    if success:
+                        logger.debug('Removed updated SKU\'s from buffer')
+                    else:
+                        logging.warning('Error removing SKU\'s from buffer')
 
 class Job(HourlyJob):
     help = "Synchronise stock with Slash2 SOAP server."
