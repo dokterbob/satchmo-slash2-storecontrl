@@ -7,7 +7,8 @@ from decimal import Decimal
 from django_extensions.management.jobs import HourlyJob
 
 from satchmo_storecontrl.settings import SLASH2_QUERY_LIMIT, \
-                                         SLASH2_DEBUG_MODE
+                                         SLASH2_DEBUG_MODE, \
+                                         SLASH2_ADD_ZEROSTOCK
 
 from satchmo_storecontrl.util import get_slash2
 
@@ -59,6 +60,34 @@ class Job(HourlyJob):
 
     def execute(self):
         s = get_slash2()
+        
+        # if SLASH2_ADD_ZEROSTOCK:
+        #     logger.info('Adding products with zero stock to buffer')
+        #     
+        #     add_count = 0
+        #     for product in Product.objects.filter(items_in_stock=0):
+        #         # See if the SKU is numeric at all
+        #         
+        #         try:
+        #             int(product.sku)
+        #             sku_numeric = True
+        #         except ValueError:
+        #             sku_numeric = False
+        #         
+        #         if sku_numeric:
+        #             success = s.addSkuToBuffer([product.sku,])
+        # 
+        #             if success:
+        #                 logger.debug('Added SKU to buffer',
+        #                              extra={'data': dict(product=product,
+        #                                                  sku=product.sku)})
+        #                 add_count += 1
+        #             else:
+        #                 logging.warning('Removed SKU from buffer',
+        #                              extra={'data': dict(product=product,
+        #                                                  sku=product.sku)})
+        #     logger.debug('Added %d products to buffer', add_count)
+                    
 
         logger.debug('Fetching max. %d updated products.',
                         SLASH2_QUERY_LIMIT)
@@ -81,7 +110,7 @@ class Job(HourlyJob):
                     success = s.removeSkuFromBuffer([product['sku'],])
         
                     if success:
-                        logger.debug('Removed updated SKU\'s from buffer.')
+                        logger.debug('Removed updated SKU\'s from buffer')
                     else:
-                        logging.warning('Error removing SKU\'s from buffer.')
+                        logging.warning('Error removing SKU\'s from buffer')
         

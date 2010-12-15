@@ -7,3 +7,4 @@ SLASH2_CALCULATE_TAX_AUTO = getattr(settings, 'SLASH2_CALCULATE_TAX_AUTO', 'fals
 SLASH2_TAX_PERCENT = getattr(settings, 'SLASH2_TAX_PERCENT', '0')  
 SLASH2_CONTINUE_ORDER = getattr(settings, 'SLASH2_CONTINUE_ORDER', 'false')
 SLASH2_DEBUG_MODE = getattr(settings, 'SLASH2_DEBUG_MODE', False)
+# SLASH2_ADD_ZEROSTOCK = getattr(settings, 'SLASH2_ADD_ZEROSTOCK', False)
