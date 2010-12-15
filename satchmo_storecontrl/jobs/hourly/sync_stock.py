@@ -54,7 +54,7 @@ def update_sku_qty(sku, qty):
         
     return False
 
-def update_products(products):
+def update_products(slash2, products):
     logger.debug('%d products returned.', len(products))        
 
     success_list = []
@@ -68,7 +68,7 @@ def update_products(products):
                 logger.info('Not removing updated articles from buffer - debug mode.')
             else:
         
-                success = s.removeSkuFromBuffer([product['sku'],])
+                success = slash2.removeSkuFromBuffer([product['sku'],])
 
                 if success:
                     logger.debug('Removed updated SKU\'s from buffer')
@@ -79,7 +79,7 @@ class Job(HourlyJob):
     help = "Synchronise stock with Slash2 SOAP server."
 
     def execute(self):
-        s = get_slash2()
+        slash2 = get_slash2()
         
         logger.debug('Fetching max. %d updated products.',
                         SLASH2_QUERY_LIMIT)
@@ -94,22 +94,19 @@ class Job(HourlyJob):
         
             more_items = True
             while more_items:
-                logger.debug(options)
-
-                products = s.getProductQty(options)
+                products = slash2.getProductQty(options)
             
-                update_products(products)
+                update_products(slash2, products)
                 
                 options['offset'] += SLASH2_QUERY_LIMIT
                 
                 if len(products) < SLASH2_QUERY_LIMIT:
                     more_items = False
         else:
-            logger.debug(options)
-            products = s.getProductQty(options)
+            products = slash2.getProductQty(options)
 
             # If buffer mode is not used, we can only do a single round
-            update_products(products)
+            update_products(slash2, products)
             
             
         
