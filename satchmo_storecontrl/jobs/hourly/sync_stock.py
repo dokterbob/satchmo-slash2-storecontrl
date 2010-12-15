@@ -17,7 +17,7 @@ from product.models import Product
 
 def get_product_by_sku(sku):
     try:
-        product = Product.objects.get(sku=sku)
+        product = Product.objects.get(sku__contains=sku)
 
         logger.debug('Product found', extra={'data': dict(sku=sku)})
         
@@ -60,7 +60,7 @@ def update_products(slash2, products):
     success_list = []
 
     for product in products:            
-        success = update_sku_qty(product['sku'], product['qty'])
+        success = update_sku_qty(product['sku'].strip(), product['qty'])
                 
         if success:
             # Remove the SKU's which have been processed, if any have been processed at all
