@@ -8,7 +8,7 @@ from django_extensions.management.jobs import HourlyJob
 
 from satchmo_storecontrl.settings import SLASH2_QUERY_LIMIT, \
                                          SLASH2_DEBUG_MODE, \
-                                         SLASH2_ADD_ZEROSTOCK
+                                         SLASH2_FETCH_ALL
 
 from satchmo_storecontrl.util import get_slash2
 
@@ -53,7 +53,27 @@ def update_sku_qty(sku, qty):
                     extra={'data': dict(sku=sku)})
         
     return False
-    
+
+def update_products(products):
+    logger.debug('%d products returned.', len(products))        
+
+    success_list = []
+
+    for product in products:            
+        success = update_sku_qty(product['sku'], product['qty'])
+                
+        if success:
+            # Remove the SKU's which have been processed, if any have been processed at all
+            if SLASH2_DEBUG_MODE:
+                logger.info('Not removing updated articles from buffer - debug mode.')
+            else:
+        
+                success = s.removeSkuFromBuffer([product['sku'],])
+
+                if success:
+                    logger.debug('Removed updated SKU\'s from buffer')
+                else:
+                    logging.warning('Error removing SKU\'s from buffer')
 
 class Job(HourlyJob):
     help = "Synchronise stock with Slash2 SOAP server."
@@ -61,56 +81,36 @@ class Job(HourlyJob):
     def execute(self):
         s = get_slash2()
         
-        # if SLASH2_ADD_ZEROSTOCK:
-        #     logger.info('Adding products with zero stock to buffer')
-        #     
-        #     add_count = 0
-        #     for product in Product.objects.filter(items_in_stock=0):
-        #         # See if the SKU is numeric at all
-        #         
-        #         try:
-        #             int(product.sku)
-        #             sku_numeric = True
-        #         except ValueError:
-        #             sku_numeric = False
-        #         
-        #         if sku_numeric:
-        #             success = s.addSkuToBuffer([product.sku,])
-        # 
-        #             if success:
-        #                 logger.debug('Added SKU to buffer',
-        #                              extra={'data': dict(product=product,
-        #                                                  sku=product.sku)})
-        #                 add_count += 1
-        #             else:
-        #                 logging.warning('Removed SKU from buffer',
-        #                              extra={'data': dict(product=product,
-        #                                                  sku=product.sku)})
-        #     logger.debug('Added %d products to buffer', add_count)
-                    
-
         logger.debug('Fetching max. %d updated products.',
                         SLASH2_QUERY_LIMIT)
         
-        products = s.getProductQty({'limit': SLASH2_QUERY_LIMIT})
+        options = {'limit': SLASH2_QUERY_LIMIT}
         
-        logger.debug('%d products returned.', len(products))        
+        if SLASH2_FETCH_ALL:
+            options.update({'useBuffer': False,
+                            'offset': 0 })
+                            
+            logger.debug('Fetching in buffer mode')
         
-        success_list = []
-        
-        for product in products:            
-            success = update_sku_qty(product['sku'], product['qty'])
-                        
-            if success:
-                # Remove the SKU's which have been processed, if any have been processed at all
-                if SLASH2_DEBUG_MODE:
-                    logger.info('Not removing updated articles from buffer - debug mode.')
-                else:
+            more_items = True
+            while more_items:
+                logger.debug(options)
+
+                products = s.getProductQty(options)
+            
+                update_products(products)
                 
-                    success = s.removeSkuFromBuffer([product['sku'],])
+                options['offset'] += SLASH2_QUERY_LIMIT
+                
+                if len(products) < SLASH2_QUERY_LIMIT:
+                    more_items = False
+        else:
+            logger.debug(options)
+            products = s.getProductQty(options)
+
+            # If buffer mode is not used, we can only do a single round
+            update_products(products)
+            
+            
         
-                    if success:
-                        logger.debug('Removed updated SKU\'s from buffer')
-                    else:
-                        logging.warning('Error removing SKU\'s from buffer')
-        
+                        
