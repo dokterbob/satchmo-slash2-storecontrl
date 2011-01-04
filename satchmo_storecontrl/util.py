@@ -62,7 +62,7 @@ class Slash2(object):
     
         except IndexError:
         
-            logging.debug('Invalid data in Monkey. Exception prevented.')
+            logger.debug('Invalid data in Monkey. Exception prevented.')
             return [] 
 
 

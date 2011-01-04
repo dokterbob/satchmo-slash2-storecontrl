@@ -101,8 +101,11 @@ class Job(HourlyJob):
                 
                 options['offset'] += SLASH2_QUERY_LIMIT
                 
-                if len(products) <= SLASH2_QUERY_LIMIT:
+                if len(products) < SLASH2_QUERY_LIMIT:
                     more_items = False
+                    logger.debug('Finished lookup, bailing out')
+                else:
+                    logger.debug('There is more to find here.')
         else:
             products = slash2.getProductQty(options)
 
