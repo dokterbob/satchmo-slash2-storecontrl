@@ -86,9 +86,9 @@ class Slash2(object):
                     endresult.append(dict(zip(keys, values)))
 
                 except Exception:
-                    logging.exception('Monkey failed with IndexError, data was: %s' % item)
+                    logger.exception('Monkey failed with IndexError, data was: %s' % item)
         else:
-            logging.warning('We got a boolean instead of a list. Will assume \
+            logger.warning('We got a boolean instead of a list. Will assume \
                 it represents an empty list.')
 
         return endresult

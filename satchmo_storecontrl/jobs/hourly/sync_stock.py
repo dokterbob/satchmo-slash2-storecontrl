@@ -74,7 +74,7 @@ def update_products(slash2, products):
                     if success:
                         logger.debug('Removed updated SKU\'s from buffer')
                     else:
-                        logging.warning('Error removing SKU\'s from buffer')
+                        logger.warning('Error removing SKU\'s from buffer')
 
 class Job(HourlyJob):
     help = "Synchronise stock with Slash2 SOAP server."
