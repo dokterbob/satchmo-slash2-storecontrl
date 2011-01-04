@@ -69,22 +69,29 @@ class Slash2(object):
     @staticmethod
     def _qty_monkey(results):
         """ Monkey method wrapping API results into something useful. """
-                
+
         endresult = []
-        for item in results:
-            try:
-                keys = [Slash2.doofus(o.key) for o in item[0]]
+        
+        # It looks like the Slash2 API returns a boolean with value False
+        # instead of an empty list. Not only is this retarded, we also have
+        # to work our way around it.
+        if results:
+            for item in results:
+                try:
+                    keys = [Slash2.doofus(o.key) for o in item[0]]
                 
 
-                values = [Slash2.doofus(o.value) for o in item[0]]
+                    values = [Slash2.doofus(o.value) for o in item[0]]
 
-                endresult.append(dict(zip(keys, values)))
+                    endresult.append(dict(zip(keys, values)))
 
-            except Exception:
-                logging.exception('Monkey failed with IndexError, data was: %s' % item)
+                except Exception:
+                    logging.exception('Monkey failed with IndexError, data was: %s' % item)
+        else:
+            logging.warning('We got a boolean instead of a list. Will assume \
+                it represents an empty list.')
 
         return endresult
-            
     
     def __getattr__(self, attr):
         """ Wrap the service's functions nicely in a package. """
