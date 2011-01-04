@@ -8,7 +8,8 @@ from django_extensions.management.jobs import HourlyJob
 
 from satchmo_storecontrl.settings import SLASH2_QUERY_LIMIT, \
                                          SLASH2_DEBUG_MODE, \
-                                         SLASH2_FETCH_ALL
+                                         SLASH2_FETCH_ALL, \
+                                         SLASH2_REMOVE_UNMATCHED
 
 from satchmo_storecontrl.util import get_slash2
 
@@ -62,7 +63,7 @@ def update_products(slash2, products):
     for product in products:            
         success = update_sku_qty(product['sku'].strip(), product['qty'])
                 
-        if success:
+        if success or SLASH2_REMOVE_UNMATCHED:
             # Remove the SKU's which have been processed, if any have been processed at all
             if SLASH2_DEBUG_MODE:
                 logger.info('Not removing updated articles from buffer - debug mode.')

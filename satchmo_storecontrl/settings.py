@@ -9,3 +9,6 @@ SLASH2_CONTINUE_ORDER = getattr(settings, 'SLASH2_CONTINUE_ORDER', 'false')
 SLASH2_DEBUG_MODE = getattr(settings, 'SLASH2_DEBUG_MODE', False)
 # SLASH2_ADD_ZEROSTOCK = getattr(settings, 'SLASH2_ADD_ZEROSTOCK', False)
 SLASH2_FETCH_ALL = getattr(settings, 'SLASH2_FETCH_ALL', False)
+
+SLASH2_REMOVE_UNMATCHED = getattr(settings, 'SLASH2_REMOVE_UNMATCHED', False)
+""" Remove unmatched products from bugger"""
