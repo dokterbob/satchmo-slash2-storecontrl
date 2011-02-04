@@ -100,7 +100,7 @@ class StockManager(object):
             while more_items:
                 products = self.slash2.getProductQty(options)
 
-                self.update_products(products)
+                self.update_products(products, fetch_all)
 
                 options['offset'] += SLASH2_QUERY_LIMIT
 
