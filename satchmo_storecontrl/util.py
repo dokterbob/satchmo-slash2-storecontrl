@@ -88,7 +88,7 @@ class Slash2(object):
                 except Exception:
                     logger.exception('Monkey failed with IndexError, data was: %s' % item)
         else:
-            logger.warning('We got a boolean instead of a list. Will assume \
+            logger.info('We got a boolean instead of a list. Will assume \
                 it represents an empty list.')
 
         return endresult
