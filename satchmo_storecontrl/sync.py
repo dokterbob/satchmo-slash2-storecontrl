@@ -86,8 +86,7 @@ class StockManager(object):
                             logger.warning('Error removing SKU\'s from buffer')
 
     def sync_stock(self, fetch_all=SLASH2_FETCH_ALL):
-        logger.debug('Fetching max. %d updated products.',
-        SLASH2_QUERY_LIMIT)
+        logger.debug('Fetching max. %d updated products.', SLASH2_QUERY_LIMIT)
 
         options = {'limit': SLASH2_QUERY_LIMIT}
 

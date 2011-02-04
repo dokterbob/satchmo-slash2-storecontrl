@@ -30,5 +30,12 @@ SLASH2_FETCH_ALL = getattr(settings, 'SLASH2_FETCH_ALL', False)
     When True, all items in the system are returned.
 """
 
+SLASH2_FETCH_ALL_DAILY  = getattr(settings, 'SLASH2_FETCH_ALL_DAILY', True)
+""" 
+Whether or not to perform a daily fetch of all products, regardless of
+SLASH2_FETCH_ALL.
+"""
+
 SLASH2_REMOVE_UNMATCHED = getattr(settings, 'SLASH2_REMOVE_UNMATCHED', False)
 """ Remove unmatched products from bugger"""
+
