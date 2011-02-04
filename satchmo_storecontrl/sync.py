@@ -64,7 +64,7 @@ class StockManager(object):
         
         return False
     
-    def update_products(self, products):
+    def update_products(self, products, fetch_all):
         logger.debug('%d products returned.', len(products))        
 
         success_list = []
@@ -77,7 +77,7 @@ class StockManager(object):
                 if SLASH2_DEBUG_MODE:
                     logger.info('Not removing updated articles from buffer - debug mode.')
                 else:
-                    if not SLASH2_FETCH_ALL:
+                    if not fetch_all:
                         success = self.slash2.removeSkuFromBuffer([product['sku'],])
 
                         if success:
@@ -113,4 +113,4 @@ class StockManager(object):
             products = self.slash2.getProductQty(options)
 
             # If buffer mode is not used, we can only do a single round
-            self.update_products(products)
+            self.update_products(products, fetch_all)
